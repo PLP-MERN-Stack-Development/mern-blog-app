@@ -76,3 +76,16 @@ Your work will be automatically submitted when you push to your GitHub Classroom
 - [React Documentation](https://react.dev/)
 - [Node.js Documentation](https://nodejs.org/en/docs/)
 - [Mongoose Documentation](https://mongoosejs.com/docs/) 
+## 🌐 Live Demo - Complete MERN Stack with MongoDB Atlas
+
+- **Frontend (Netlify)**: https://melodious-sopapillas-54d147.netlify.app/
+- **Backend API (Render)**: https://mern-blog-backend-2efn.onrender.com
+- **Database (MongoDB Atlas)**: Cloud database with full CRUD operations
+
+### 🚀 Fully Deployed Features
+- ✅ Real cloud database (MongoDB Atlas)
+- ✅ Full CRUD operations
+- ✅ Search and filtering
+- ✅ Responsive design
+- ✅ Professional deployment
+
