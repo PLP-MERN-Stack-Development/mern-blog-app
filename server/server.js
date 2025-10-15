@@ -1,78 +1,86 @@
-// server.js - Main server file for the MERN blog application
-
-// Import required modules
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const path = require('path');
-
-// Import routes
-const postRoutes = require('./routes/posts');
-const categoryRoutes = require('./routes/categories');
-const authRoutes = require('./routes/auth');
+﻿import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
 
 // Load environment variables
 dotenv.config();
 
-// Initialize Express app
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// In-memory data storage (temporary, until we set up MongoDB)
+let posts = [
+  {
+    _id: "1",
+    title: "Welcome to MERN Blog",
+    content: "This is your first blog post. Start writing!",
+    author: "System",
+    createdAt: new Date().toISOString()
+  }
+];
 
-// Log requests in development mode
-if (process.env.NODE_ENV === 'development') {
-  app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    next();
-  });
-}
-
-// API routes
-app.use('/api/posts', postRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/auth', authRoutes);
-
-// Root route
-app.get('/', (req, res) => {
-  res.send('MERN Blog API is running');
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.statusCode || 500).json({
-    success: false,
-    error: err.message || 'Server Error',
+// Basic route
+app.get("/", (req, res) => {
+  res.json({ 
+    success: true,
+    message: "MERN Blog API is running!",
+    timestamp: new Date().toISOString()
   });
 });
 
-// Connect to MongoDB and start server
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('Connected to MongoDB');
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+// Health check route
+app.get("/api/health", (req, res) => {
+  res.json({
+    success: true,
+    message: "Server is healthy (MongoDB not connected)",
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Get all posts
+app.get("/api/posts", (req, res) => {
+  res.json({
+    success: true,
+    count: posts.length,
+    data: posts
+  });
+});
+
+// Create new post
+app.post("/api/posts", (req, res) => {
+  const { title, content } = req.body;
+  
+  if (!title || !content) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide title and content"
     });
-  })
-  .catch((err) => {
-    console.error('Failed to connect to MongoDB', err);
-    process.exit(1);
+  }
+  
+  const newPost = {
+    _id: (posts.length + 1).toString(),
+    title,
+    content,
+    author: "Anonymous",
+    createdAt: new Date().toISOString()
+  };
+  
+  posts.push(newPost);
+  
+  res.status(201).json({
+    success: true,
+    data: newPost
   });
-
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Promise Rejection:', err);
-  // Close server & exit process
-  process.exit(1);
 });
 
-module.exports = app; 
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log("🚀 Server running on port " + PORT);
+  console.log("📡 API available at http://localhost:" + PORT);
+  console.log("💡 Using in-memory storage (MongoDB not connected)");
+});
