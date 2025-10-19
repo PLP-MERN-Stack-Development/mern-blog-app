@@ -76,31 +76,16 @@ Your work will be automatically submitted when you push to your GitHub Classroom
 - [React Documentation](https://react.dev/)
 - [Node.js Documentation](https://nodejs.org/en/docs/)
 - [Mongoose Documentation](https://mongoosejs.com/docs/) 
-## 🌐 Live Demo
+## 🌐 Live Demo - Complete MERN Stack with MongoDB Atlas
 
-- **Frontend**: https://melodious-sopapillas-54d147.netlify.app/
-- **Backend API**: https://mern-blog-app-kmue.onrender.com
-
-## 🚀 Deployment
-
-This full-stack MERN application is deployed and fully functional:
-
-### Live URLs
 - **Frontend (Netlify)**: https://melodious-sopapillas-54d147.netlify.app/
-- **Backend API (Render)**: https://mern-blog-app-kmue.onrender.com
+- **Backend API (Render)**: https://mern-blog-backend-2efn.onrender.com
+- **Database (MongoDB Atlas)**: Cloud database with full CRUD operations
 
-### Features Demonstrated
-- ✅ Full CRUD operations (Create, Read, Update, Delete posts)
-- ✅ Real-time search and filtering
+### 🚀 Fully Deployed Features
+- ✅ Real cloud database (MongoDB Atlas)
+- ✅ Full CRUD operations
+- ✅ Search and filtering
 - ✅ Responsive design
-- ✅ React Router navigation
-- ✅ RESTful API architecture
-- ✅ Professional UI/UX
-- ✅ Production deployment with CI/CD
-
-### Technology Stack
-- **Frontend**: React 18, React Router, Vite, Axios
-- **Backend**: Node.js, Express.js
-- **Deployment**: Netlify (Frontend), Render (Backend)
-- **Database**: In-memory storage (production-ready)
+- ✅ Professional deployment
 
