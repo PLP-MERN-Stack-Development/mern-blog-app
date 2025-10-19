@@ -1,161 +1,120 @@
-﻿import React, { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import axios from "axios"
+﻿import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import RichTextEditor from "../components/RichTextEditor";
+import SimpleTextEditor from "../components/SimpleTextEditor";
 
 const CreatePost = () => {
-  const navigate = useNavigate()
-  const [formData, setFormData] = useState({
-    title: "",
-    content: "",
-    excerpt: ""
-  })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [useSimpleEditor, setUseSimpleEditor] = useState(false);
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!formData.title || !formData.content) {
-      setError("Title and content are required")
-      return
+    e.preventDefault();
+    if (!title.trim() || !content.trim()) {
+      setError("Please fill in all fields");
+      return;
     }
 
-    setLoading(true)
-    setError("")
+    setLoading(true);
+    setError("");
 
     try {
-      await axios.post("/api/posts", formData)
-      navigate("/")
+      const response = await fetch("http://localhost:5000/api/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content })
+      });
+      const data = await response.json();
+      if (data.success) {
+        navigate("/posts/" + data.data._id);
+      } else {
+        setError("Error creating post");
+      }
     } catch (error) {
-      setError(error.response?.data?.message || "Error creating post")
+      setError("Network error");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
+  };
+
+  if (!currentUser) {
+    return (
+      <div className="auth-container">
+        <div className="auth-card">
+          <h2>Access Denied</h2>
+          <p>Please log in to create posts.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-      <h1>Create New Post</h1>
-      
-      {error && (
-        <div style={{ 
-          backgroundColor: "#f8d7da", 
-          color: "#721c24", 
-          padding: "0.75rem", 
-          borderRadius: "4px",
-          marginBottom: "1rem"
-        }}>
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "1rem" }}>
-          <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "bold" }}>
-            Title *
-          </label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            style={{
-              width: "100%",
-              padding: "0.5rem",
-              border: "1px solid #ddd",
-              borderRadius: "4px",
-              fontSize: "1rem"
-            }}
-            placeholder="Enter post title"
-            required
-          />
-        </div>
-
-        <div style={{ marginBottom: "1rem" }}>
-          <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "bold" }}>
-            Excerpt
-          </label>
-          <textarea
-            name="excerpt"
-            value={formData.excerpt}
-            onChange={handleChange}
-            rows="3"
-            style={{
-              width: "100%",
-              padding: "0.5rem",
-              border: "1px solid #ddd",
-              borderRadius: "4px",
-              fontSize: "1rem",
-              resize: "vertical"
-            }}
-            placeholder="Brief description of your post (optional)"
-          />
-        </div>
-
-        <div style={{ marginBottom: "1.5rem" }}>
-          <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "bold" }}>
-            Content *
-          </label>
-          <textarea
-            name="content"
-            value={formData.content}
-            onChange={handleChange}
-            rows="10"
-            style={{
-              width: "100%",
-              padding: "0.5rem",
-              border: "1px solid #ddd",
-              borderRadius: "4px",
-              fontSize: "1rem",
-              resize: "vertical"
-            }}
-            placeholder="Write your post content here..."
-            required
-          />
-        </div>
-
-        <div style={{ display: "flex", gap: "1rem" }}>
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              backgroundColor: "#27ae60",
-              color: "white",
-              padding: "0.75rem 1.5rem",
-              border: "none",
-              borderRadius: "4px",
-              fontSize: "1rem",
-              cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.7 : 1
-            }}
-          >
-            {loading ? "Creating..." : "Create Post"}
-          </button>
-          <button
+    <div className="auth-container">
+      <div className="auth-card" style={{ maxWidth: "800px" }}>
+        <h2 className="auth-title">Create New Post</h2>
+        
+        <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+          <button 
             type="button"
-            onClick={() => navigate("/")}
-            style={{
-              backgroundColor: "#95a5a6",
-              color: "white",
-              padding: "0.75rem 1.5rem",
-              border: "none",
-              borderRadius: "4px",
-              fontSize: "1rem",
-              cursor: "pointer"
-            }}
+            onClick={() => setUseSimpleEditor(!useSimpleEditor)}
+            className="btn btn-secondary"
           >
-            Cancel
+            {useSimpleEditor ? "Switch to Rich Editor" : "Switch to Simple Editor"}
           </button>
         </div>
-      </form>
-    </div>
-  )
-}
 
-export default CreatePost
+        {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="Post Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              className="form-input"
+            />
+          </div>
+          <div className="form-group">
+            {useSimpleEditor ? (
+              <SimpleTextEditor
+                value={content}
+                onChange={setContent}
+                placeholder="Write your post content here..."
+              />
+            ) : (
+              <RichTextEditor
+                value={content}
+                onChange={setContent}
+                placeholder="Write your post content here..."
+              />
+            )}
+          </div>
+          <div className="form-actions">
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="auth-button"
+            >
+              {loading ? "Creating Post..." : "Create Post"}
+            </button>
+            <button 
+              type="button" 
+              onClick={() => navigate("/")}
+              className="btn btn-secondary"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default CreatePost;

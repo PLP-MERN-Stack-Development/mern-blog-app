@@ -1,55 +1,61 @@
-﻿import React from "react"
-import { Link } from "react-router-dom"
+﻿import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Layout = ({ children }) => {
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <header style={{ 
-        backgroundColor: "#2c3e50", 
-        color: "white", 
-        padding: "1rem 2rem",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-      }}>
-        <div style={{ 
-          maxWidth: "1200px", 
-          margin: "0 auto", 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center" 
-        }}>
-          <Link to="/" style={{ color: "white", textDecoration: "none", fontSize: "1.5rem", fontWeight: "bold" }}>
+    <div className="app-container">
+      <nav className="navbar">
+        <div className="nav-content">
+          <Link to="/" className="logo">
             MERN Blog
           </Link>
-          <nav>
-            <Link to="/" style={{ color: "white", textDecoration: "none", margin: "0 1rem" }}>
+          
+          <div className="nav-links">
+            <Link to="/" className="nav-link">
               Home
             </Link>
-            <Link to="/create-post" style={{ color: "white", textDecoration: "none", margin: "0 1rem" }}>
-              Create Post
-            </Link>
-          </nav>
+            
+            {currentUser ? (
+              <>
+                <Link to="/create-post" className="nav-link">
+                  Create Post
+                </Link>
+                <Link to={`/profile/${currentUser.id}`} className="nav-link">
+                  Profile
+                </Link>
+                <span className="user-greeting">Hello, {currentUser.username}</span>
+                <button onClick={handleLogout} className="nav-button">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="nav-link">
+                  Login
+                </Link>
+                <Link to="/register" className="nav-button">
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
         </div>
-      </header>
+      </nav>
       
-      <main style={{ flex: 1, padding: "2rem" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          {children}
-        </div>
+      <main className="main-content">
+        {children}
       </main>
-      
-      <footer style={{ 
-        backgroundColor: "#34495e", 
-        color: "white", 
-        textAlign: "center", 
-        padding: "1rem",
-        marginTop: "auto"
-      }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          <p>&copy; 2024 MERN Blog. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;

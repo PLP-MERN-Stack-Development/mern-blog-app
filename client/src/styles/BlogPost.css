@@ -1,0 +1,76 @@
+@"
+/* Action buttons container */
+.action-buttons {
+  display: flex !important;
+  gap: 10px;
+  margin-top: 15px;
+  padding: 10px 0;
+  visibility: visible !important;
+}
+
+/* Image upload button styling */
+.image-upload-btn {
+  background-color: #4CAF50 !important;
+  color: white !important;
+  padding: 8px 16px !important;
+  border: none !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  display: inline-block !important;
+  visibility: visible !important;
+}
+
+.image-upload-btn:hover {
+  background-color: #45a049 !important;
+}
+
+/* Edit button styling */
+.edit-btn {
+  background-color: #2196F3 !important;
+  color: white !important;
+  padding: 8px 16px !important;
+  border: none !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  visibility: visible !important;
+}
+
+.edit-btn:hover {
+  background-color: #0b7dda !important;
+}
+
+/* Delete button styling */
+.delete-btn {
+  background-color: #f44336 !important;
+  color: white !important;
+  padding: 8px 16px !important;
+  border: none !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  visibility: visible !important;
+}
+
+.delete-btn:hover {
+  background-color: #da190b !important;
+}
+
+/* Ensure blog post container is visible */
+.blog-post {
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin: 10px;
+  border-radius: 8px;
+  background-color: white;
+}
+
+/* Make sure image is visible */
+.post-image {
+  max-width: 100%;
+  height: auto;
+  margin: 10px 0;
+  border-radius: 4px;
+}
+"@ | Out-File -FilePath "src/styles/BlogPost.css" -Encoding utf8
