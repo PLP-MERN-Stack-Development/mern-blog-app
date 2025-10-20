@@ -8,8 +8,10 @@ import jwt from 'jsonwebtoken';
 dotenv.config();
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true
+}));
 
 mongoose.connect(process.env.MONGODB_URI).then(() => console.log('MongoDB Connected')).catch(err => console.log(err));
 
