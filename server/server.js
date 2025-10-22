@@ -9,8 +9,10 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
-  credentials: true
+  origin: ['http://localhost:3000', 'https://biscoohitos-f81ea7.netlify.app'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 mongoose.connect(process.env.MONGODB_URI).then(() => console.log('MongoDB Connected')).catch(err => console.log(err));
@@ -184,6 +186,24 @@ app.delete('/api/comments/:id', auth, async (req, res) => {
     res.json({ message: 'Deleted' });
   } catch (error) {
     res.status(500).json({ message: 'Failed' });
+  }
+});
+
+app.get('/api/categories', async (req, res) => {
+  try {
+    const categories = ['Technology', 'Travel', 'Food', 'Lifestyle', 'Health', 'Business', 'Other'];
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch categories' });
+  }
+});
+
+app.post('/api/categories', authMiddleware, async (req, res) => {
+  try {
+    const { name } = req.body;
+    res.status(201).json({ message: 'Category endpoint ready', category: name });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to create category' });
   }
 });
 
