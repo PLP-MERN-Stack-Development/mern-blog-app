@@ -8,6 +8,33 @@ import jwt from 'jsonwebtoken';
 dotenv.config();
 const app = express();
 
+// Validation middleware
+const validateRequest = (schema) => {
+  return (req, res, next) => {
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+    next();
+  };
+};
+
+// Validation schemas
+const Joi = (await import('joi')).default;
+
+const registerSchema = Joi.object({
+  username: Joi.string().min(3).max(30).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required()
+});
+
+const postSchema = Joi.object({
+  title: Joi.string().min(3).max(200).required(),
+  content: Joi.string().min(10).required(),
+  category: Joi.string(),
+  tags: Joi.array(),
+  image: Joi.string().allow('')
+});
 app.use(cors({
   origin: ['http://localhost:3000', 'https://biscoohitos-f81ea7.netlify.app'],
   credentials: true,
@@ -58,16 +85,37 @@ const auth = async (req, res, next) => {
   }
 };
 
-app.post('/api/auth/register', async (req, res) => {
+app.post('/api/auth/register', validateRequest(registerSchema), async (req, res) => {
+  console.log(' Registration request received:', req.body);
   try {
+    console.log('Registration attempt:', req.body); 
     const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'Please provide all required fields' });
+    }
+
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(400).json({ 
+        message: existingUser.email === email ? 'Email already registered' : 'Username already taken'
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ username, email, password: hashedPassword });
     await user.save();
+
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-    res.status(201).json({ token, user: { id: user._id, username, email, profilePicture: user.profilePicture } });
+
+    res.status(201).json({
+      message: 'User registered successfully',
+      token,
+      user: { id: user._id, username, email, profilePicture: user.profilePicture }
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Registration failed' });
+    console.error('Registration error:', error); // ADD THIS
+    res.status(500).json({ message: 'Registration failed', error: error.message });
   }
 });
 
@@ -211,5 +259,28 @@ app.get('/', (req, res) => {
   res.json({ message: 'API Running' });
 });
 
+const Category = mongoose.model('Category', new mongoose.Schema({
+  name: { type: String, required: true, unique: true }
+}, { timestamps: true }));
+
+app.get('/api/categories', async (req, res) => {
+  try {
+    const categories = ['Technology', 'Travel', 'Food', 'Lifestyle', 'Health', 'Business', 'Other'];
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch categories' });
+  }
+});
+
+app.post('/api/categories', auth, async (req, res) => {
+  try {
+    const { name } = req.body;
+    const category = new Category({ name });
+    await category.save();
+    res.status(201).json({ message: 'Category created', category });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to create category' });
+  }
+});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log('Server on port ' + PORT));
