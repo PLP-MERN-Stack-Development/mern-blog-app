@@ -5,7 +5,6 @@ Full-stack blog application built with MongoDB, Express.js, React.js, and Node.j
 ## 🌐 Live Demo
 
 - **Frontend:** https://biscoohitos-f81ea7.netlify.app
-- **Backend API:** https://mern-blog-app-kmue.onrender.com
 - **GitHub Repository:** https://github.com/PLP-MERN-Stack-Development/mern-blog-app
 
 ## ✨ Features
